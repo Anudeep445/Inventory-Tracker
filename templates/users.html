@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Accounts | Inventory Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar"><a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">IM</span><span>Inventory<br>Manager</span></a>
+        <p class="nav-label">WORKSPACE</p><a class="nav-link" href="{{ url_for('index') }}"><span>▦</span> Dashboard</a>
+        <a class="nav-link active" href="{{ url_for('manage_users') }}"><span>♙</span> Manage Accounts</a>
+        <div class="sidebar-note"><span class="note-dot"></span><div><strong>Account settings</strong><small>Admin access only</small></div></div>
+    </aside>
+    <main class="main-content">
+        <header class="topbar"><div><p class="eyebrow">ADMINISTRATION</p><h1>Manage Accounts</h1></div>
+            <div class="profile"><span class="avatar">{{ current_user['full_name'][0]|upper }}</span><div><strong>{{ current_user['full_name'] }}</strong><small>{{ role_labels[current_user['role']] }}</small></div>
+                <form action="{{ url_for('logout') }}" method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="logout-button" type="submit">Log out</button></form>
+            </div>
+        </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+        <section class="panel users-panel"><div class="panel-heading"><div><h2>User Accounts</h2><p>Set a new password for an account. Passwords are saved as secure hashes.</p></div></div>
+            <div class="account-list">{% for user in users %}<article class="account-card">
+                <div class="account-heading"><span class="item-avatar">{{ user['full_name'][0]|upper }}</span><div><strong>{{ user['full_name'] }}</strong><small>{{ user['username'] }} · {{ role_labels[user['role']] }}</small></div></div>
+                <form action="{{ url_for('reset_user_password', user_id=user['id']) }}" method="POST" class="reset-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <label>New password<input type="password" name="password" minlength="8" autocomplete="new-password" required></label>
+                    <label>Confirm password<input type="password" name="confirm_password" minlength="8" autocomplete="new-password" required></label>
+                    <button class="btn" type="submit">Reset password</button>
+                </form>
+            </article>{% else %}<p class="empty-note">No user accounts found.</p>{% endfor %}</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
